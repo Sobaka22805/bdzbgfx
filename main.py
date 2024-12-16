@@ -12,15 +12,14 @@ if responce.status_code == 200:
 
     # Каждая строка, это день, то-есть, 1-я строка = Понедельник, 2-я строка = Вторник и т.д. я не смог реализовать это, извините.
     for weather in weathers:
-        aboba = weather.findNext().text[4:].replace('°', '')
-        result = float(aboba)
-        print(result)
+        aboba = weather.findNext().text[4:]
+        print('Temperature ->', aboba)
 
 connection = sqlite3.connect('BD.sl3', 10)
 cur_db = connection.cursor()
 
 # cur_db.execute("CREATE TABLE weathers (aboba FLOAT);")
 
-cur_db.execute("INSERT INTO weathers (aboba) VALUES (@result);", {'aboba': result})
+cur_db.execute("INSERT INTO weathers (aboba) VALUES (@aboba);")
 connection.commit()
 connection.close()
