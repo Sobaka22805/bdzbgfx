@@ -4,22 +4,36 @@ import sqlite3
 
 responce = requests.get('https://sinoptik.ua/')
 
+temperature = []
+
 if responce.status_code == 200:
 
     item_site = BeautifulSoup(responce.text, features='html.parser')
     weathers = item_site.find_all('div', {'class', 'XyT+Rm+n'})
     days = item_site.find_all('p', {'class', 'BzO81ZRx'})
 
-    # Каждая строка, это день, то-есть, 1-я строка = Понедельник, 2-я строка = Вторник и т.д. я не смог реализовать это, извините.
     for weather in weathers:
         aboba = weather.findNext().text[4:]
-        print('Temperature ->', aboba)
+        # print('Temperature ->', aboba)
+        temperature.append(aboba)
 
-connection = sqlite3.connect('BD.sl3', 10)
+if not len(temperature):
+    raise ValueError
+# print(temperature)
+
+connection = sqlite3.connect('temperature_db.sl3')
 cur_db = connection.cursor()
 
-# cur_db.execute("CREATE TABLE weathers (aboba FLOAT);")
+# cur_db.execute("CREATE TABLE weathers (temperature TEXT);")
+# print(temperature[0])
 
-cur_db.execute("INSERT INTO weathers (aboba) VALUES (@aboba);")
+for i in range(len(temperature)):
+    # print(temperature[i])
+    cur_db.execute("INSERT INTO weathers (temperature) VALUES (?)", (temperature[i],))
+
+cur_db.execute("SELECT temperature FROM weathers;")
+result = cur_db.fetchall()
+print('Results from DB ->', result)
+
 connection.commit()
 connection.close()
